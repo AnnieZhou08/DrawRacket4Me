@@ -1,0 +1,66 @@
+<html>
+  
+</html>
+
+<script>
+  
+var ProgressStage = {
+  OPENBRACKET: 1, //(
+  CONSTRUCTOR: 2, //MAKE
+  IDENTIFIER: 3, //NODE 
+  ARGUMENTS: 4, //VAL KEY LEFT RIGHT
+  CLOSEBRACKET: 5 
+}
+
+function process(block){
+  
+  var thisProcessStage = ProgressStage.OPENBRACKET;
+  var constructor = "";
+  var identifier = "";
+  
+  for (var i = 0, s = block.length; i < s; i++){
+    var c = block[i];
+    
+    switch(thisProcessStage){
+      case ProgressStage.OPENBRACKET:
+        if (c == " "){
+          continue;
+        } else if (c != "("){
+          throw "Error: Bad Syntax";
+        } else {
+          thisProcessStage = ProgressStage.CONSTRUCTOR;
+          console.log(thisProcessStage);
+        }
+        break;
+      
+      case ProgressStage.CONSTRUCTOR:
+        if (c == " "){
+          continue;
+        } else if (constructor == "make"){
+          thisProcessStage = ProgressStage.IDENTIFIER;
+        } else if (constructor.length > 4){
+          throw "Error: not a constructor";
+        } else {
+            constructor += c;
+        }
+        break;
+      
+      case ProgressStage.IDENTIFIER:
+        if (c == " "){
+          thisProcessStage = ProgressStage.ARGUMENTS;
+          console.log("hello");
+        } else if (c == ")"){
+          throw "Error: Syntax / No Arguments Found";
+        } else {
+          identifier += c;
+        }
+        break;
+          
+    }
+  }
+  console.log(constructor);
+  console.log(identifier);
+    
+}
+
+</script>
