@@ -21,9 +21,6 @@ function process(block, identity){
   var currentArgument = 0;
   var numOpenBrackets = 0;
   var hadSpace = false;
-  var path = "";
-  var layer = 0;
-  var alreadyClosed = false;
   
   for (var i = 0, s = block.length; i < s; i++){
     var c = block[i];
@@ -37,16 +34,13 @@ function process(block, identity){
         } else {
           numOpenBrackets++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;
+          console.log(thisProcessStage);
         }
         break;
       
       case ProgressStage.CONSTRUCTOR:
         if (c == " "){
           continue;
-        } else if (constructor == "list"){
-          constructor = "";
-          numOpenBrackets++;
-          layer++;
         } else if (constructor == "make"){
           thisProcessStage = ProgressStage.IDENTIFIER;
         } else if (constructor.length > 4){
@@ -61,6 +55,7 @@ function process(block, identity){
           if (identifier == identity){
             thisProcessStage = ProgressStage.ARGUMENTS;
           } else {
+            console.log(identifier);
             throw "Error: Identifier undefined";
           }
         } else if (c == ")"){
@@ -80,9 +75,7 @@ function process(block, identity){
           numOpenBrackets--;
           if (numOpenBrackets == 0){
             break;
-          } else{
-            thisProcessStage = ProgressStage.CLOSEBRACKET;
-          }
+          } 
         } else if (c == "("){
           numOpenBrackets++;
           identifier = "";
@@ -97,27 +90,12 @@ function process(block, identity){
             arguments[currentArgument] += c;
           }
         }
-        break; 
-      case ProgressStage.CLOSEBRACKET:
-        if (c == ")" && alreadyClosed ==false){
-          layer--;
-          alreadyClosed = true;
-        } else if (c == " "){
-          continue;
-        } else if (c == "("){
-          constructor = "";
-          identifier = "";
-          currentArgument++;
-          thisProcessStage = ProgressStage.CONSTRUCTOR;
-        }
-        
-        break;
+        break;          
     }
   }
   console.log(constructor);
+  console.log(identifier);
   console.log(arguments);
-  console.log(numOpenBrackets);
-  console.log(layer);
     
 }
 
