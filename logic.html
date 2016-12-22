@@ -9,7 +9,7 @@ var ProgressStage = {
   CONSTRUCTOR: 2, //MAKE
   IDENTIFIER: 3, //NODE 
   ARGUMENTS: 4, //VAL KEY LEFT RIGHT
-  CLOSEBRACKET: 5 
+  CLOSEBRACKET: 5 //)
 }
 
 function process(block, identity){
@@ -23,7 +23,7 @@ function process(block, identity){
   var hadSpace = false;
   var path = "";
   var layer = 0;
-  var alreadyClosed = false;
+  var alreadyClosed = false; //brackets for (list and (make-node form an even and odd parity; thus we need a boolean to toggle parity values
   
   for (var i = 0, s = block.length; i < s; i++){
     var c = block[i];
@@ -81,6 +81,7 @@ function process(block, identity){
           if (numOpenBrackets == 0){
             break;
           } else{
+            alreadyClosed = false;
             thisProcessStage = ProgressStage.CLOSEBRACKET;
           }
         } else if (c == "("){
@@ -109,6 +110,8 @@ function process(block, identity){
           identifier = "";
           currentArgument++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;
+        } else {
+          alreadyClosed = false;
         }
         
         break;
