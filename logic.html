@@ -17,13 +17,14 @@ function process(block, identity){
   var thisProcessStage = ProgressStage.OPENBRACKET;
   var constructor = "";
   var identifier = "";
-  var arguments = [];
+  var arguments = []; 
   var currentArgument = 0;
   var numOpenBrackets = 0;
   var hadSpace = false;
-  var path = "";
+  var path = []; path.push(-1);
   var layer = 0;
-  var alreadyClosed = false; //brackets for (list and (make-node form an even and odd parity; thus we need a boolean to toggle parity values
+  var alreadyClosed = true; //brackets for (list and (make-node form an even and odd parity; thus we need a boolean to toggle parity values
+  var addedLayer = false;
   
   for (var i = 0, s = block.length; i < s; i++){
     var c = block[i];
@@ -44,10 +45,18 @@ function process(block, identity){
         if (c == " "){
           continue;
         } else if (constructor == "list"){
+          alreadyClosed = false;
           constructor = "";
           numOpenBrackets++;
+          path.push(0);
+          addedLayer = true;
           layer++;
         } else if (constructor == "make"){
+          alreadyClosed = true;  
+          if (addedLayer == false){
+              path[layer]=path[layer]+1;
+            }
+            addedLayer = false;
           thisProcessStage = ProgressStage.IDENTIFIER;
         } else if (constructor.length > 4){
           throw "Error: not a constructor";
@@ -79,15 +88,18 @@ function process(block, identity){
         } else if (c == ")"){
           numOpenBrackets--;
           if (numOpenBrackets == 0){
+            arguments[currentArgument] +="|"+path;
             break;
           } else{
             alreadyClosed = false;
+            arguments[currentArgument] += "|" + path + "*" + layer;
             thisProcessStage = ProgressStage.CLOSEBRACKET;
           }
         } else if (c == "("){
           numOpenBrackets++;
           identifier = "";
           constructor = "";
+          arguments[currentArgument] +="|"+path+"*"+layer;
           currentArgument++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;
         } else{
@@ -101,7 +113,9 @@ function process(block, identity){
         break; 
       case ProgressStage.CLOSEBRACKET:
         if (c == ")" && alreadyClosed ==false){
+          arguments[currentArgument] += "|" + path + "*" + layer;
           layer--;
+          path.pop();
           alreadyClosed = true;
         } else if (c == " "){
           continue;
@@ -110,18 +124,37 @@ function process(block, identity){
           identifier = "";
           currentArgument++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;
-        } else {
+        } else if (c==")") {
           alreadyClosed = false;
         }
-        
         break;
     }
   }
+  
+  processArguments(arguments);
+  
   console.log(constructor);
   console.log(arguments);
   console.log(numOpenBrackets);
   console.log(layer);
     
+}
+
+function processArguments(arguments){
+  var info = [];
+  for (var i = 0; i < arguments.length; i++){
+    var arg = arguments[i];
+    var sliceIndex = arg.indexOf("*");
+    var fieldIndex = arg.indexOf("|");
+    
+    var fields = arg.substr(0,fieldIndex);
+    var path = arg.substring(fieldIndex+1,sliceIndex);
+    console.log(path);
+    
+    info[i] = new Array (fields, path);
+  }
+  console.log(info);
+  return info;
 }
 
 </script>
