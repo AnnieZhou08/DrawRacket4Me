@@ -149,12 +149,94 @@ function processArguments(arguments){
     
     var fields = arg.substr(0,fieldIndex);
     var path = arg.substring(fieldIndex+1,sliceIndex);
-    console.log(path);
-    
     info[i] = new Array (fields, path);
   }
   console.log(info);
+  getChildren (info);
+}
+  
+function getChildren(info){
+  for (var j = 0; j < info.length; j++){
+    var count = 0;
+    var route = info[j][1];
+    for (var k = 0; k < info.length; k++){
+      if (info[k][1].length == route.length &&
+          info[k][1].charAt(info[k][1].length-3) ==
+          route.charAt(route.length-3)) {
+        count++;
+      }
+    }
+    info[j] = new Array (info[j][0], info[j][1], count, window.innerWidth, window.innerWidth, window.innerHeight);
+  }
+  info[0][4] /= 2;
+  getXCoordinates(info);
+  console.log(info);
   return info;
 }
+// Right now, info = Array(data, path, num-of-siblings, width, x-coordinate, y-coordinate); Note that it is also stored in order of descend.
+  
+function getXCoordinates(info){
+  for (var i = 1; i < info.length; i++){
+    if (info[i][1].length == info[i-1][1].length+2){
+      //meaning this node is the previous nodes' child
+      var siblings = info[i][2];
+      var index = parseInt(info[i][1].charAt(info[i][1].length-1));
+      var width = info[i-1][3];
+      var x_coordinate = info[i-1][4];
+      
+      var new_width = width/(siblings+1);
+      var new_x = x_coordinate + (index - (siblings/2 - 0.5))*new_width;
+      
+      info[i][3] = new_width;
+      info[i][4] = new_x;      
+    } else if (info[i][1].length == info[i-1][1].length){ //meaning this node is previous nodes' sibling node
+      var index = parseInt(info[i][1].charAt(info[i][1].length-1));
+      var width = info[i-1][3];
+      var x_coordinate = info[i-1][4];
+      
+      var new_x = x_coordinate+width;
+      
+      info[i][3] = width;
+      info[i][4] = new_x;
+    }else{
+      //meaning this layer is done; need to find the nodes' sibling
+      for (var j = 1; j < info.length; j++){
+        if (info[j][1].length == info[i][1].length &&
+            info[j][1].charAt(info[j][1].length-3) ==
+            info[i][1].charAt(info[i][1].length-3)){
+        var index = parseInt(info[i][1].charAt(info[i][1].length-1));
+        var width = info[j][3];
+        var x_coordinate = info[j][4];
+      
+        var new_x = x_coordinate+width;
+      
+        info[i][3] = width;
+        info[i][4] = new_x; 
+          break;
+        }
+        
+      }
+    }
+  }
+  console.log(info);
+}
+
+
+//lstnodes passed in is an ordered pair of destination x and y values
+/*
+function drawTreeList(originx, originy, lstnodes){
+  for (int i = 0; i < lstnodes; i++){
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+    ctx.beginPath();
+    ctx.moveTo(originx, originy);
+    ctx.lineTo(lstnodes[i][0], lstnodes[i][0]);
+    ctx.stroke();
+  }
+}
+  
+  console.log(nchildren);
+*/
+
 
 </script>
