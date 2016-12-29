@@ -3,23 +3,21 @@ var ProgressStage = {
   CONSTRUCTOR: 2, //MAKE
   IDENTIFIER: 3, //NODE 
   ARGUMENTS: 4, //VAL KEY LEFT RIGHT
-  CLOSEBRACKET: 5 //)
+  CLOSEBRACKET: 5 
 }
 
-function process(block, identity){
+function processFinite(block, identity){
   
   var thisProcessStage = ProgressStage.OPENBRACKET;
   var constructor = "";
   var identifier = "";
-  var arguments = []; 
+  var arguments = [];
   var currentArgument = 0;
   var numOpenBrackets = 0;
   var hadSpace = false;
-  var path = []; path.push(-1);
-  var layer = 0;
-  var alreadyClosed = true; //brackets for (list and (make-node form an even and odd parity; thus we need a boolean to toggle parity values
-  var addedLayer = false;
-  
+  var closingMake = false;
+  var empty ="";
+    
   for (var i = 0, s = block.length; i < s; i++){
     var c = block[i];
     
@@ -32,27 +30,17 @@ function process(block, identity){
         } else {
           numOpenBrackets++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;
+          console.log(thisProcessStage);
         }
         break;
       
       case ProgressStage.CONSTRUCTOR:
-        if (c == " " || c == "\n"){
+        if (c == " "){
           continue;
-        } else if (constructor == "list"){
-          alreadyClosed = false;
-          constructor = "";
-          numOpenBrackets++;
-          path.push(0);
-          addedLayer = true;
-          layer++;
         } else if (constructor == "make"){
-          alreadyClosed = true;  
-          if (addedLayer == false){
-              path[layer]=path[layer]+1;
-            }
-            addedLayer = false;
+          closingMake = true;
           thisProcessStage = ProgressStage.IDENTIFIER;
-        } else if (constructor.length > 1000){
+        } else if (constructor.length > 4){
           throw "Error: not a constructor";
         } else {
             constructor += c;
@@ -64,6 +52,7 @@ function process(block, identity){
           if (identifier == identity){
             thisProcessStage = ProgressStage.ARGUMENTS;
           } else {
+            console.log(identifier);
             throw "Error: Identifier undefined";
           }
         } else if (c == ")"){
@@ -77,23 +66,19 @@ function process(block, identity){
         if (arguments.length == currentArgument){
            arguments[currentArgument]="";
         }
-        if (c == " " || c == "\n"){
+        if (c == " "||c == "\n"){
           hadSpace = true;
         } else if (c == ")"){
           numOpenBrackets--;
           if (numOpenBrackets == 0){
-            arguments[currentArgument] +="|"+path;
             break;
-          } else{
-            alreadyClosed = false;
-            arguments[currentArgument] += "|" + path + "*" + layer;
+          } else {
             thisProcessStage = ProgressStage.CLOSEBRACKET;
           }
         } else if (c == "("){
           numOpenBrackets++;
           identifier = "";
           constructor = "";
-          arguments[currentArgument] +="|"+path+"*"+layer;
           currentArgument++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;
         } else{
@@ -104,65 +89,83 @@ function process(block, identity){
             arguments[currentArgument] += c;
           }
         }
-        break; 
+        break;
+        
       case ProgressStage.CLOSEBRACKET:
-        if (c == ")" && alreadyClosed ==false){
-          arguments[currentArgument] += "|" + path + "*" + layer;
-          layer--;
-          path.pop();
-          alreadyClosed = true;
-        } else if (c == " "){
+        if (c == " "){
           continue;
-        } else if (c == "("){
-          constructor = "";
+        }else if (c == "("){
+          numOpenBrackets++;
           identifier = "";
+          constructor = "";
           currentArgument++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;
-        } else if (c==")") {
-          alreadyClosed = false;
+        }else if (c == ")"){
+          numOpenBrackets--;
+          if (numOpenBrackets == 0){
+            break;
+          }
+        }else {
+          empty += c;
+          if (empty == "empty"){
+            currentArgument++;
+            arguments[currentArgument] = "empty";
+            empty = "";
+          }
         }
-        break;
     }
   }
+  console.log(constructor);
+  console.log(identifier);
   console.log(arguments);
-  processArguments(arguments);    
+  
+  processFiniteArguments(arguments);
 }
 
-function processArguments(arguments){
+function processFiniteArguments(arguments){
+  var path = [];
   var info = [];
-  for (var i = 0; i < arguments.length; i++){
-    var arg = arguments[i];
-    var sliceIndex = arg.indexOf("*");
-    var fieldIndex = arg.indexOf("|");
+  path.push("0");
+  info[0] = new Array(arguments[0], path[0], 2, window.innerWidth, window.innerWidth/2, 30);
+  
+  for (var i = 0; i < arguments.length-1; i++){
+    var node = arguments[i];
+    var countEmpty = (node.match(/empty/g) || []).length;
     
-    var fields = arg.substr(0,fieldIndex);
-    var path = arg.substring(fieldIndex+1,sliceIndex);
-    info[i] = new Array (fields, path);
-  }
-  getSibling (info);
-}
-  
-function getSibling(info){
-  for (var j = 0; j < info.length; j++){
-    var count = 0;
-    var route = info[j][1];
-    for (var k = 0; k < info.length; k++){
-      if (info[k][1].length == route.length &&
-          info[k][1].charAt(info[k][1].length-3) ==
-          route.charAt(route.length-3)) {
-        count++;
+    var next = arguments[i+1];
+    
+    if (countEmpty == 0){
+      //the next node is the left child
+      path[i+1] = path[i]+",0";
+      info[i+1] = new Array(next, path[i+1], 2, window.innerWidth, window.innerWidth, window.innerHeight);      
+      
+    } else if (countEmpty == 1){
+      //the next node is the right child
+      path[i+1] = path[i]+",1";
+      info[i+1] = new Array(next, path[i+1], 2, window.innerWidth, window.innerWidth, window.innerHeight);
+      
+    } else if (countEmpty == 2){
+      //this is a leaf node; the next node has to find the first one "empty" in its data; because it will be its right child;
+      for (var j = i-1; j >= 0; j--){
+        var prev = arguments[j];
+        var countEmptyII = (prev.match(/empty/g)  || []).length;
+        if(countEmptyII == 0){
+          path[i+1] = info[j][1] + ",1";
+          info[i+1] = new Array(next, path[i+1], 2, window.innerWidth, window.innerWidth, window.innerHeight);
+          arguments[j] = arguments[j] + ",empty";
+          console.log(arguments[j]);
+          break;
+        }
       }
+    } else {
+      throw "Error: incorrect number of fields";
     }
-    info[j] = new Array (info[j][0], info[j][1], count, window.innerWidth, window.innerWidth, window.innerHeight);
   }
-  info[0][4] /= 2;
-  info[0][5] = 30;
-  getXYCoordinates(info);
-  
+  console.log(info);
+  getXYCoordinatesFinite(info);
 }
-// Right now, info = Array(data, path, num-of-siblings, width, x-coordinate, y-coordinate); Note that it is also stored in order of descend.
   
-function getXYCoordinates(info){
+function getXYCoordinatesFinite(info){
   var height = 0;
   for (var n = 1; n < info.length; n++){
     height = Math.max(height, info[n][1].length);
@@ -227,11 +230,11 @@ function getXYCoordinates(info){
     }
   }
   console.log(info);
-  drawTree(info);
+  drawTreeFinite(info);
 }
 
 //lstnodes passed in is an ordered pair of destination x and y values
-function drawTree(info){
+function drawTreeFinite(info){
   var c = document.getElementById("myCanvas");
   var ctx = c.getContext("2d");
 
