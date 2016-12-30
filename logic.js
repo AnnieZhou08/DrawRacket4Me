@@ -38,7 +38,7 @@ function process(block, identity){
       case ProgressStage.CONSTRUCTOR:
         if (c == " " || c == "\n"){
           continue;
-        } else if (constructor == "list"){
+        } else if (constructor == "list" || constructor == "'("){
           alreadyClosed = false;
           constructor = "";
           numOpenBrackets++;
@@ -93,6 +93,13 @@ function process(block, identity){
           numOpenBrackets++;
           identifier = "";
           constructor = "";
+          arguments[currentArgument] +="|"+path+"*"+layer;
+          currentArgument++;
+          thisProcessStage = ProgressStage.CONSTRUCTOR;
+        } else if (c == "'"){
+          numOpenBrackets++;
+          identifier = "";
+          constructor = "'";
           arguments[currentArgument] +="|"+path+"*"+layer;
           currentArgument++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;

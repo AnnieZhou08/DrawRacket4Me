@@ -1,0 +1,110 @@
+<html>
+
+</html>
+
+<script>
+var ProgressStage = {
+  OPENBRACKET : 1,
+  ARGUMENTS : 3,
+  CLOSEBRACKET : 4  
+}
+
+// design scheme:
+/*
+There are two types of constructing a graph:
+'((A (B C D))
+  (B (E F G))
+  (C (D B E))) ... or
+  
+(list (list A (list B C D))
+      (list B (list E F G))
+      (list C (list D B E)))
+      
+Note that graph always opens with 1 extra bracket. The brackets
+in the middle come in 2 pairs, and each node has 2 pairs.
+*/
+function processGraph(block){
+  var thisProcessStage = ProgressStage.OPENBRACKET;
+  var numOpenBrackets = 0;
+  var currentArgument = 0;
+  var arguments = [];
+  var edge = [];
+  var currentEdge = 0;
+  var argument = "";
+  
+  for (var i = 0; i < block.length; i++){
+    var c = block.charAt(i);
+    
+    switch(thisProcessStage){
+      case ProgressStage.OPENBRACKET:
+        if(c == " " || c == "'") continue;
+        else if(c == "(" && numOpenBrackets == 0) numOpenBrackets++;
+        else if(c == "("){
+          numOpenBrackets++;
+          thisProcessStage = ProgressStage.ARGUMENTS;
+        } else {
+          continue;
+        }
+        break;
+      
+      case ProgressStage.ARGUMENTS:
+        if(arguments.length == currentArgument){
+          arguments[currentArgument] = [];
+        }
+        if (c == " "){
+          if(argument == "list"){
+            argument ="";
+          }else{
+            edge[currentEdge] = argument;
+            currentEdge++;
+            argument = "";
+          }
+        } else if (c == "("){
+          if (argument == "list"){
+            argument ="";
+          }
+          numOpenBrackets++;
+        } else if (c == ")"){
+          numOpenBrackets--;
+          if(numOpenBrackets == 1){
+            arguments[currentArgument]=edge;
+            edge = [];
+            currentEdge = 0;
+            currentArgument++;
+            thisProcessStage = ProgressStage.OPENBRACKET;
+          } else if (numOpenBrackets == 0){
+            break;
+          } else {
+            edge[currentEdge] = argument;
+            argument = "";
+          }
+        } else{
+          argument += c;
+        }
+        break;
+    }
+  }
+  console.log(arguments);
+  processGraphArguments(arguments);
+}
+  
+function processGraphArguments(arguments){
+  var numNodes = arguments.length;
+  var startx = window.innerWidth/2;
+  var starty = window.innerHeight/2;
+  var radius = 3/4 * starty;
+  var angle = 2*Math.PI/numNodes;
+  
+  var positions = [numNodes];
+  
+  for(var i = 0; i < arguments.length; i++){
+    var node = arguments[i][0];
+    var x = radius * Math.cos(angle*i) + startx;
+    var y = radius * Math.sin(angle*i) + starty;
+    
+    positions[i] = new Array(node, x, y);
+  }
+  console.log(positions);
+}
+
+</script>
