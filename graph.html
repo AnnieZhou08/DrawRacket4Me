@@ -1,5 +1,7 @@
 <html>
-
+  <canvas id = "myCanvas", width = "1280", height = "700", style = "border: 1px, solid, black; margin-top:10%">
+      Your browser does not support HTML5 canvas tag
+  </canvas>
 </html>
 
 <script>
@@ -105,6 +107,48 @@ function processGraphArguments(arguments){
     positions[i] = new Array(node, x, y);
   }
   console.log(positions);
+  drawGraph(arguments, positions);
+}
+  
+function drawGraph(arguments, positions){
+  var canvas = document.getElementById("myCanvas");
+  var ctx = canvas.getContext("2d");
+  for (var i = 0; i < arguments.length; i++){
+    var node = arguments[i][0];
+    var start = findPosition(node, positions);
+    var startx = start[0];
+    var starty = start[1];
+    for (var j = 1; j < arguments[i].length; j++){
+      ctx.moveTo(startx, starty);
+      var neighbour = arguments[i][j];
+      var destination = findPosition(neighbour, positions);
+      var destx = destination[0];
+      var desty = destination[1];
+      ctx.lineTo(destx, desty);
+      ctx.stroke();
+    }
+  }
+  for (var i = 0; i < positions.length; i++){
+    ctx.beginPath();
+    ctx.arc(positions[i][1],positions[i][2],20,0,2*Math.PI);
+    ctx.fillStyle = "white";
+    ctx.fill();
+    ctx.stroke();
+    
+    ctx.font = "18px Times New Roman";
+    ctx.fillStyle = "black";
+    ctx.textAlign = "center";
+    ctx.fillText(positions[i][0], positions[i][1], positions[i][2]); //can do because positions is filled in order of arguments;
+  }
+}
+function findPosition(node, positions){
+  console.log(node.toString());
+  for (var i = 0; i < positions.length; i++){
+    if (node == positions[i][0]){
+      return positions[i].slice(1);
+    }
+  }
+  throw "Error: node not found";
 }
 
 </script>
