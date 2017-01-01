@@ -7,7 +7,6 @@ var ProgressStage = {
 }
 
 function process(block, identity){
-  
   var thisProcessStage = ProgressStage.OPENBRACKET;
   var constructor = "";
   var identifier = "";
@@ -38,7 +37,7 @@ function process(block, identity){
       case ProgressStage.CONSTRUCTOR:
         if (c == " " || c == "\n"){
           continue;
-        } else if (constructor == "list" || constructor == "'("){
+        } else if (constructor == "list"){
           alreadyClosed = false;
           constructor = "";
           numOpenBrackets++;
@@ -93,13 +92,6 @@ function process(block, identity){
           numOpenBrackets++;
           identifier = "";
           constructor = "";
-          arguments[currentArgument] +="|"+path+"*"+layer;
-          currentArgument++;
-          thisProcessStage = ProgressStage.CONSTRUCTOR;
-        } else if (c == "'"){
-          numOpenBrackets++;
-          identifier = "";
-          constructor = "'";
           arguments[currentArgument] +="|"+path+"*"+layer;
           currentArgument++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;
@@ -299,4 +291,3 @@ function drawTree(info){
       ctx.textAlign = "center";
       ctx. fillText(info[0][0], info[0][4], info[0][5]);
 }
-
