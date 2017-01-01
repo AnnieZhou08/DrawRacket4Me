@@ -1,3 +1,10 @@
+<html>
+  <canvas id = "myCanvas", width = "1280", height = "700", style = "border: 1px, solid, black; margin-top:10%">
+      Your browser does not support HTML5 canvas tag
+  </canvas>
+</html>
+
+<script>
 var ProgressStage = {
   OPENBRACKET : 1,
   ARGUMENTS : 3,
@@ -32,7 +39,7 @@ function processGraph(block){
     
     switch(thisProcessStage){
       case ProgressStage.OPENBRACKET:
-        if(c == " " || c == "'" || c == "\n") continue;
+        if(c == " " || c == "'") continue;
         else if(c == "(" && numOpenBrackets == 0) numOpenBrackets++;
         else if(c == "("){
           numOpenBrackets++;
@@ -46,7 +53,7 @@ function processGraph(block){
         if(arguments.length == currentArgument){
           arguments[currentArgument] = [];
         }
-        if (c == " " || c == "\n"){
+        if (c == " "){
           if(argument == "list" || argument == "" || argument.trim()==""){
             argument ="";
           }else{
@@ -231,3 +238,4 @@ function findPosition(node, positions){
   }
   throw "Error: node not found";
 }
+</script>

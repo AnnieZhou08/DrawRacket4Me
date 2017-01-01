@@ -26,6 +26,6 @@ window.onload = function start (){
       throw "Error: please select a type";
     }
     
-    notif.innerHTML = "See your tree below. Please refresh page to draw a new tree!";
+    notif.innerHTML = "See your tree/graph below. Please refresh page to draw a new tree/graph!";
   });
 }
