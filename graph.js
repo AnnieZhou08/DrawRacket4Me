@@ -1,10 +1,3 @@
-<html>
-  <canvas id = "myCanvas", width = "1280", height = "700", style = "border: 1px, solid, black; margin-top:10%">
-      Your browser does not support HTML5 canvas tag
-  </canvas>
-</html>
-
-<script>
 var ProgressStage = {
   OPENBRACKET : 1,
   ARGUMENTS : 3,
@@ -86,7 +79,6 @@ function processGraph(block){
         break;
     }
   }
-  console.log(arguments);
   processGraphArguments(arguments);
 }
   
@@ -111,6 +103,7 @@ function processGraphArguments(arguments){
 }
   
 function drawGraph(arguments, positions){
+  var CIRCLE_RADIUS = 20;
   var canvas = document.getElementById("myCanvas");
   var ctx = canvas.getContext("2d");
   for (var i = 0; i < arguments.length; i++){
@@ -124,13 +117,29 @@ function drawGraph(arguments, positions){
       var destination = findPosition(neighbour, positions);
       var destx = destination[0];
       var desty = destination[1];
+      var theta = Math.atan((desty - starty) / (destx - startx));
+      var phi = Math.abs(theta);
+      console.log(phi);
+      if (desty < starty && destx > startx){
+        destx = destx - CIRCLE_RADIUS*Math.cos(phi);
+        desty = desty + CIRCLE_RADIUS*Math.sin(phi);
+      }else if (desty < starty && destx < startx){
+        destx = destx + CIRCLE_RADIUS*Math.cos(phi);
+        desty = desty + CIRCLE_RADIUS*Math.sin(phi);        
+      }else if (desty > starty && destx < startx){
+        destx = destx + CIRCLE_RADIUS*Math.cos(phi);
+        desty = desty - CIRCLE_RADIUS*Math.sin(phi);
+      }else if (desty > starty && destx > startx){
+        destx = destx - CIRCLE_RADIUS*Math.cos(phi);
+        desty = desty - CIRCLE_RADIUS*Math.sin(phi);
+      }
       ctx.lineTo(destx, desty);
       ctx.stroke();
     }
   }
   for (var i = 0; i < positions.length; i++){
     ctx.beginPath();
-    ctx.arc(positions[i][1],positions[i][2],20,0,2*Math.PI);
+    ctx.arc(positions[i][1],positions[i][2],CIRCLE_RADIUS,0,2*Math.PI);
     ctx.fillStyle = "white";
     ctx.fill();
     ctx.stroke();
@@ -140,9 +149,76 @@ function drawGraph(arguments, positions){
     ctx.textAlign = "center";
     ctx.fillText(positions[i][0], positions[i][1], positions[i][2]); //can do because positions is filled in order of arguments;
   }
+  for (var i = 0; i < arguments.length; i++){
+    var node = arguments[i][0];
+    var start = findPosition(node, positions);
+    var startx = start[0];
+    var starty = start[1];
+    for (var j = 1; j < arguments[i].length; j++){
+      var neighbour = arguments[i][j];
+      var destination = findPosition(neighbour, positions);
+      var destx = destination[0];
+      var desty = destination[1];
+      var theta = Math.atan((desty - starty) / (destx - startx));
+      var phi = Math.abs(theta);
+      console.log(phi);
+      if(desty.toFixed(5) == starty.toFixed(5) && destx < startx){
+        destx = destx + CIRCLE_RADIUS;
+        phi = -Math.PI/2;
+      }else if (desty.toFixed(5) == starty.toFixed(5) && destx > startx){
+        destx = destx - CIRCLE_RADIUS;
+        phi = Math.PI/2;
+      }else if (destx.toFixed(5) == startx.toFixed(5) && desty > starty){
+        desty = desty - CIRCLE_RADIUS;
+        phi = Math.PI;
+      }else if (destx.toFixed(5) == startx.toFixed(5) && desty < starty){
+        desty = desty + CIRCLE_RADIUS;
+        phi = 0;
+      }else if (desty < starty && destx > startx){
+        destx = destx - CIRCLE_RADIUS*Math.cos(phi);
+        desty = desty + CIRCLE_RADIUS*Math.sin(phi);
+        phi = Math.PI/2 - phi;
+      }else if (desty < starty && destx < startx){
+        destx = destx + CIRCLE_RADIUS*Math.cos(phi);
+        desty = desty + CIRCLE_RADIUS*Math.sin(phi);
+        phi = 2*Math.PI - (Math.PI/2 - phi);
+      }else if (desty > starty && destx < startx){
+        destx = destx + CIRCLE_RADIUS*Math.cos(phi);
+        desty = desty - CIRCLE_RADIUS*Math.sin(phi);
+        phi = Math.PI + (Math.PI/2 - phi);
+      }else if (desty > starty && destx > startx){
+        destx = destx - CIRCLE_RADIUS*Math.cos(phi);
+        desty = desty - CIRCLE_RADIUS*Math.sin(phi);
+        phi = phi + Math.PI/2;
+      }
+      drawArrowHead(destx, desty, phi);
+    }
+  }
 }
+
+  
+function drawArrowHead(x, y, theta){
+  var canvas = document.getElementById("myCanvas");
+  var ctx = canvas.getContext("2d");
+  
+  var width = canvas.width/2;
+  var height = canvas.height/2;
+  
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(theta); 
+  ctx.translate(-x,-y);
+  
+  ctx.beginPath();
+  ctx.moveTo(x,y);
+  ctx.lineTo(x-10,y+10);
+  ctx.lineTo(x+10,y+10);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+  
 function findPosition(node, positions){
-  console.log(node.toString());
   for (var i = 0; i < positions.length; i++){
     if (node == positions[i][0]){
       return positions[i].slice(1);
@@ -150,5 +226,3 @@ function findPosition(node, positions){
   }
   throw "Error: node not found";
 }
-
-</script>

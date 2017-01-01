@@ -1,0 +1,25 @@
+<html>
+  <canvas id = "myCanvas", width = "1280", height = "700", style = "border: 1px, solid, black; margin-top:10%">
+      Your browser does not support HTML5 canvas tag
+  </canvas>
+</html>
+<script>
+function drawArrowHead(x, y, theta){
+  var canvas = document.getElementById("myCanvas");
+  var ctx = canvas.getContext("2d");
+  
+  var width = canvas.width/2;
+  var height = canvas.height/2;
+  ctx.translate(x,y);
+  ctx.rotate(theta); 
+  ctx.translate(-x,-y);
+  
+  ctx.beginPath();
+  ctx.moveTo(x,y);
+  ctx.lineTo(x-10,y+10);
+  ctx.lineTo(x+10,y+10);
+  ctx.closePath();
+  ctx.fill();
+}
+
+</script>

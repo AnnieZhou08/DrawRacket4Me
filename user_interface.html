@@ -2,20 +2,24 @@
   <head> 
     <script src="logic.js"></script>
     <script src="binary.js"></script>
+    <script src="graph.js"></script>
     <script src="animation.js"></script>
   </head>
   <body style = "text-align:center; margin-top: 5%; background-color: #F9EFD6">
     (define-struct <input id = "identifier" type = "text" name = "firstname" placeholder="identifier name only" font = "Times New Roman">) <br> <br>
     <table style="text-align:center; width = 50%; margin-left: auto; margin-right: auto">
       <tr>
-        <td><input type="checkbox" name="list" id="list" value="list"></td><td>List</td>
+        <td><input type="checkbox" name="list" id="list" value="list"></td><td>N-Children</td>
       </tr>
       <tr>
         <td><input type="checkbox" name="binary" id = "binary" value = "binary"></td><td>Binary</td>
       </tr>
+      <tr>
+        <td><input type="checkbox" name="graph" id = "graph" value = "graph"></td><td>Graph</td>
+      </tr>
     </table>
     <br>
-      <textarea id = "code" rows = "23" cols = "63" placeholder="enter your tree here..."></textarea> <br> <br>
+      <textarea id = "code" rows = "23" cols = "63" placeholder="enter your tree/graph here..."></textarea> <br> <br>
       <input id = "hello" type = "submit" value = "Submit">
     <br> <br>
       <p id="notification"></p>

@@ -10,15 +10,18 @@ window.onload = function start (){
     
      var list = document.getElementById("list");
      var binary = document.getElementById("binary");
+     var graph = document.getElementById("graph");
     
      var notif = document.getElementById("notification");
     
-    if(list.checked && binary.checked){
+    if(list.checked && binary.checked || list.checked && graph.checked || graph.checked && binary.checked){
       throw "Error: cannot check both";
     }else if(binary.checked){
       processFinite(code, identifier);
     }else if(list.checked){
       process(code, identifier);
+    }else if(graph.checked){
+      processGraph(code);
     }else {
       throw "Error: please select a type";
     }
