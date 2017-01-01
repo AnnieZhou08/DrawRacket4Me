@@ -7,6 +7,7 @@ var ProgressStage = {
 }
 
 function process(block, identity){
+  
   var thisProcessStage = ProgressStage.OPENBRACKET;
   var constructor = "";
   var identifier = "";
@@ -37,7 +38,7 @@ function process(block, identity){
       case ProgressStage.CONSTRUCTOR:
         if (c == " " || c == "\n"){
           continue;
-        } else if (constructor == "list"){
+        } else if (constructor == "list" || constructor == "'("){
           alreadyClosed = false;
           constructor = "";
           numOpenBrackets++;
@@ -92,6 +93,13 @@ function process(block, identity){
           numOpenBrackets++;
           identifier = "";
           constructor = "";
+          arguments[currentArgument] +="|"+path+"*"+layer;
+          currentArgument++;
+          thisProcessStage = ProgressStage.CONSTRUCTOR;
+        } else if (c == "'"){
+          numOpenBrackets++;
+          identifier = "";
+          constructor = "'";
           arguments[currentArgument] +="|"+path+"*"+layer;
           currentArgument++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;
@@ -213,7 +221,7 @@ function getXYCoordinates(info){
         var x_coordinate = info[j][4];
           console.log(info[j]);
       
-        var new_x = x_coordinate+width;
+        var new_x = x_coordinate+width*index;
           
         var y_coordinate = layer * layerHeight + defaultHeight;
       
