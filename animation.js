@@ -10,6 +10,7 @@ window.onload = function start (){
     
      var list = document.getElementById("list");
      var binary = document.getElementById("binary");
+     var graph = document.getElementById("graph");
     
      var notif = document.getElementById("notification");
     
@@ -19,6 +20,8 @@ window.onload = function start (){
       processFinite(code, identifier);
     }else if(list.checked){
       process(code, identifier);
+    }else if (graph.checked){
+      processGraph(code);
     }else {
       throw "Error: please select a type";
     }

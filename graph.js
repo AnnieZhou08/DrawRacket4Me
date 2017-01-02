@@ -1,7 +1,9 @@
 var ProgressStage = {
-  OPENBRACKET : 1,
-  ARGUMENTS : 3,
-  CLOSEBRACKET : 4  
+  OPENBRACKET: 1, 
+  CONSTRUCTOR: 2,
+  IDENTIFIER: 3, 
+  ARGUMENTS: 4, 
+  CLOSEBRACKET: 5 
 }
 
 // design scheme:
