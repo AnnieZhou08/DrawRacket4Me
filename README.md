@@ -8,13 +8,10 @@ We all know it's a waste of time drawing the diagrams out to verify whether our 
 **But don't worry, *DrawRacket4Me* got your back!**<br>
 Simply copy and paste your code from DrRacket into DrawRacket4Me, it will automatically draw out the structure for you, whether it's trees with a list of children, or graphs with cycles. <br>
 
-<h4> Some Examples... </h4>
+<h4> Here's an Example </h4>
 <table>
 <tr>
 <td> <img src = "images/demo_code1.PNG" width = "350px"></td> <td> <img src = "images/demo_tree1.PNG" width = "400px"> </td>
-</tr>
-<tr>
-<td> <img src = "images/demo_code2.PNG" width = "350px"></td> <td> <img src = "images/demo_graph2.PNG" width = "400px"> </td>
 </tr>
 </table>
 
