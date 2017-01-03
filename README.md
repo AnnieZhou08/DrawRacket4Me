@@ -11,9 +11,13 @@ Simply copy and paste your code from DrRacket into DrawRacket4Me, it will automa
 <h4> Some Examples... </h4>
 <table>
 <tr>
-<td></td>
+<td> <img src = "images/demo_code1.PNG" width = "350px"></td> <td> <img src = "images/demo_tree1.PNG" width = "400px"> </td>
+</tr>
+<tr>
+<td> <img src = "images/demo_code2.PNG" width = "350px"></td> <td> <img src = "images/demo_graph2.PNG" width = "400px"> </td>
 </tr>
 </table>
+
 
 <h3> How to Run it? </h3>
 **EZ.**
