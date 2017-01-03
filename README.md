@@ -8,7 +8,7 @@ We all know it's a waste of time drawing the diagrams out to verify whether our 
 **But don't worry, *DrawRacket4Me* got your back!**<br>
 Simply copy and paste your code from DrRacket into DrawRacket4Me, it will automatically draw out the structure for you, whether it's trees with a list of children, or graphs with cycles. <br>
 
-<h4> Here's an Example </h4>
+<h4> Here's an Example:</h4>
 <table>
 <tr>
 <td> <img src = "images/demo_code1.PNG" width = "350px"></td> <td> <img src = "images/demo_tree1.PNG" width = "400px"> </td>
@@ -19,5 +19,10 @@ Simply copy and paste your code from DrRacket into DrawRacket4Me, it will automa
 <h3> How to Run it? </h3>
 **EZ.**
 Just `git clone` this repo and double click `start.html`, which will run the file on your favorite browser.
-
+<table>
+<tr>
+<td> Then you'll be prompted to select the type of diagram you want to draw. Just simple choose one of "N-children trees", "binary trees" and "graphs", then the continue button will immediately appear.<br>
+<strong>NOTE</strong>: N-Children Trees just means trees with a list of children, instead of only two.
+</tr>
+</table>
  
