@@ -237,6 +237,9 @@ function getXYCoordinatesFinite(info){
 function drawTreeFinite(info){
   var c = document.getElementById("myCanvas");
   var ctx = c.getContext("2d");
+  
+  ctx.fillStyle = "white";
+  ctx.fill();
 
   for (var i = 1; i < info.length; i++){
     if (info[i][1].length == info[i-1][1].length+2){
