@@ -83,6 +83,7 @@ function processFinite(block, identity){
           thisProcessStage = ProgressStage.CONSTRUCTOR;
         } else{
           if (hadSpace == true && arguments[currentArgument].length!=0){
+            console.log(arguments[currentArgument]);
             arguments[currentArgument] += ","+c;
             hadSpace = false;
           } else {
@@ -92,7 +93,7 @@ function processFinite(block, identity){
         break;
         
       case ProgressStage.CLOSEBRACKET:
-        if (c == " "){
+        if (c == " " || c == "\n"){
           continue;
         }else if (c == "("){
           numOpenBrackets++;
@@ -128,6 +129,12 @@ function processFiniteArguments(arguments){
   path.push("0");
   info[0] = new Array(arguments[0], path[0], 2, window.innerWidth, window.innerWidth/2, 30);
   
+  var count = 0;
+  
+  for (var i = 1; i < arguments.length; i++){
+    info[i] = "";
+  }
+  
   for (var i = 0; i < arguments.length-1; i++){
     var node = arguments[i];
     var countEmpty = (node.match(/empty/g) || []).length;
@@ -140,21 +147,59 @@ function processFiniteArguments(arguments){
       info[i+1] = new Array(next, path[i+1], 2, window.innerWidth, window.innerWidth, window.innerHeight);      
       
     } else if (countEmpty == 1){
-      //the next node is the right child
-      path[i+1] = path[i]+",1";
-      info[i+1] = new Array(next, path[i+1], 2, window.innerWidth, window.innerWidth, window.innerHeight);
+      //the next node is the right child unless it's completely empty
+      
+      if(node == "empty"){
+        //meaning the right side of arguments[i-1] is empty (filled); thus the very next argument has to find the first element with 0 empty while count == 0;
+        if(next == "empty"){
+          count++;
+          continue;
+        }else{
+          var tmp = count;
+          for (var j = i-1; j >= 0; j--){
+            var prev = arguments[j];
+            var countEmptyII = (prev.match(/empty/g)  || []).length;
+            if(countEmptyII == 0){
+                if (count == 0){
+                  path[i+1] = info[j][1] + ",1";
+                  info[i+1] = new Array(next, path[i+1], 2, window.innerWidth, window.innerWidth, window.innerHeight);
+                  arguments[j] = arguments[j] + ",empty";
+                  console.log(arguments[j]);
+                  count = tmp;
+                  break;
+                }else{
+                  count--;
+                }
+            }
+          }
+        }
+      }else{
+        path[i+1] = path[i]+",1";
+        info[i+1] = new Array(next, path[i+1], 2, window.innerWidth, window.innerWidth, window.innerHeight);
+      }
       
     } else if (countEmpty == 2){
       //this is a leaf node; the next node has to find the first one "empty" in its data; because it will be its right child;
-      for (var j = i-1; j >= 0; j--){
-        var prev = arguments[j];
-        var countEmptyII = (prev.match(/empty/g)  || []).length;
-        if(countEmptyII == 0){
-          path[i+1] = info[j][1] + ",1";
-          info[i+1] = new Array(next, path[i+1], 2, window.innerWidth, window.innerWidth, window.innerHeight);
-          arguments[j] = arguments[j] + ",empty";
-          console.log(arguments[j]);
-          break;
+      
+      if(next == "empty"){
+        count++;
+      }else{
+        var tmp = count;
+        for (var j = i-1; j >= 0; j--){
+          var prev = arguments[j];
+          var countEmptyII = (prev.match(/empty/g)  || []).length;
+          if(countEmptyII == 0){
+            if (count == 0){
+              path[i+1] = info[j][1] + ",1";
+              info[i+1] = new Array(next, path[i+1], 2, window.innerWidth, window.innerWidth, window.innerHeight);
+              arguments[j] = arguments[j] + ",empty";
+              console.log(arguments[j]);
+              count = tmp;
+              break;
+            }else{
+              count--;
+            }
+          }
         }
       }
     } else {
@@ -162,7 +207,16 @@ function processFiniteArguments(arguments){
     }
   }
   console.log(info);
-  getXYCoordinatesFinite(info);
+  var newInfo = [];
+  var j = 0;
+  for (var i = 0; i < info.length; i++){
+    if(info[i] != ""){
+      newInfo[j] = info[i];
+      j++;
+    }
+  }
+  console.log(newInfo);
+  getXYCoordinatesFinite(newInfo);
 }
   
 function getXYCoordinatesFinite(info){

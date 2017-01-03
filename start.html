@@ -9,7 +9,7 @@
   
   <body style = "text-align: center">
   
-    <img id = "logo" src = "images/logo2.png" width = 400px style="margin-top: 15%; opacity: 0;"> <br>
+    <a href = "start.html"><img id = "logo" src = "images/logo2.png" width = 400px style="margin-top: 15%; opacity: 0;"></a><br>
     
     <p id="instruction" style="opacity:0; font-size: 30px; color: #CBCACA" position= absolute>What do you want me to draw?</p>
     <table style="width: 50%; margin-left: auto; margin-right: auto; opacity:0; text-align: center;">
@@ -24,7 +24,9 @@
     </table> <br><br>
     <a href="#"> <img id = "continue" src="images/continue.png" width = 150px style="opacity:0;"></a> <br>
     <p id= "identity" style="font-size: 30px; opacity:0;" position = "relative">Identifier Name:</p>
+    <p id = "identitiy">
     <input id = "identifier" type = "text" name = "firstname" placeholder="e.g. node, tree" style="font-size:30px; opacity:0;">
+    </p>
     <textarea id = "code" rows = "23" cols = "63" placeholder="enter your tree/graph here..." style="opacity: 0"></textarea>
   </body>
 
@@ -48,7 +50,7 @@
       $("#instruction").fadeTo(1000,0);
       $("table").fadeTo(1000,0, function() {
         if(graph.checked){
-          $("#code").css("position","absolute").animate({top:'200px', left:'430px'},"fast", function(){
+          $("#code").css("position","relative").animate({top:'-490px', left:'0px'},"fast", function(){
           $("#code").fadeTo(800, 1, function(){
             $("#continue").click(function (){
               var code = document.getElementById("code").value;
@@ -61,15 +63,15 @@
           });
           });
         }else if(binary.checked || list.checked){
-          $("#identity").css("position","absolute").animate({top:'250px', left:'530px'},"fast");
-          $("#identifier").css("position","absolute").animate({top:'350px', left:'450px'}, "fast", function(){
+          $("#identity").css("position","relative").animate({top:'-270px', left:'0px'},"fast");
+          $("#identifier").css("position","relative").animate({top:'-270px', left:'0px'}, "fast", function(){
             $("#identity").fadeTo(800,1);
             $("#identifier").fadeTo(800,1);
           });
           $("#continue").click(function (){
             $("#identity").fadeTo(100,0);
             $("#identifier").fadeTo(100,0, function(){
-              $("#code").css("position","relative").animate({top:'-345px'},"fast", function(){
+              $("#code").css("position","relative").animate({top:'-490px'},"fast", function(){
               $("#code").fadeTo(800, 1, function(){
                 $("#continue").click(function (){
                    var identifier = document.getElementById("identifier").value;
