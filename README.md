@@ -85,6 +85,59 @@ The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.j
       - Drawing the lines: we must do this before drawing our circles (nodes) because the lines will overlap the circles and look ugly. Lines are always draw from the parent to its children. Thus for each node, we simply find its parent and draws it from the x,y coordinate of the parent to itself. To make the algorithm faster, we can test whether the parent is right before the current node, which decreases the amount of double looping needed. <br>
       - Drawing the nodes: basically using canvas to draw a circle, `filleStyle = "white"`. <br>
       - Putting down the data: gets the "letters" from our `info[]` and fills it onto the nodes. <br>
-   - AND THAT'S ALL FOR N-CHILDREN TREES!
+      
+   - **AND THAT'S ALL FOR N-CHILDREN TREES!**
+<br>
+2. **Binary Trees** `binary.js`
+   - Parsing:
+      - Follows similar steps to how we would parse an N-Children Tree. However what's different this time is that instead of storing the path in the arguments while parsing, we process the path after all the arguments have been collected. The reason for doing so is that the concept of a binary tree and an N-Children tree is slightly different (read more on it in "notes" section). A typical racket code for a binary tree with a root and right child looks like `(make-node a empty (make-node b empty empty))`. It could also look like `(make-node a 1 empty (make-node b 2 empty empty))`. Thus unlike N-Children trees, "empty" could be seen as a constructor, but without an opening bracket. Therefore there's no way of us knowing whether the character we are processing at the moment belongs to the data (e.g. "a", or the key-value pair "a, 1") or signifies that it's an empty node (unless we set an accumulator but that's messy). So here's my strategy:
+      - We parse through the racket code and collect every single argument just like we would do in N-Children trees, where whenever we hit a space, we place a "," and adds the character to the current argument, until we hit an opening bracket; then we add the rest of the arguments to a new array. For example if we have `(make-node a 1 empty (make-node b 2 empty empty))`, our `arguments[]` would look like `arguments[0] = "a,1,empty"`, `arguments[1] = "b,2,empty,empty"`. 
+      - Here's an important case to consider: `(make-node a (make-node b (make-node c empty empty) empty) empty)`; our `arguments[]` would look like: `arguments[0] = "a"`, `arguments[1] = "b"`, `arguments[2] = "c,empty,empty"`, `arguments[3] = "empty"` and `arguments[4] = "empty"`. We will come back to this one later.
+   - Processing the arguments:
+      - This is the stage where we get the path of each node. Since we are reusing our drawing strategy from N-Children trees, our denotation for the paths has to be the same. The difference here is "empty" would be treated as a child. So even if a node has no siblings, if it were to be placed on the right side, it would have an index of "1". 
+      - The thing to remember here is when we are looping through each argument, we are actually finding the path for the next node. For example if the current argument we are processing has no "empty" string, we know that the very next node has to be its child, placed at the left. Then clearly there emerge 3 cases:
+         1. No "empty": <br>
+            As forementioned, the very next node is the left child so we append "0" to the path.
+         2. One "empty": <br>
+            This means the very next node would be likely be the right child. However going back to our important case, we see that there exist 2 edge cases. One of them been that the entire argument itself == "empty" and the second one is that the very next argument also == "empty". So in our first edge case (where the very next argument is a filled node), we need to set a counter++, because the very next argument would need to find the closest node, while deducting the counter by 1, that has no "empty" and the counter == 0, which would be its parent. We then append "1" to it because it has to be a right child. Here's the code:
+            ```javascript
+             else if (countEmpty == 1){
+               //the next node is the right child unless it's completely empty
+
+               if(node == "empty"){
+                 //meaning the right side of arguments[i-1] is empty (filled); thus the very next argument has to find the first element                    with 0 empty while count == 0;
+                 if(next == "empty"){
+                   count++;
+                   continue;
+                 }else{
+                   var tmp = count;
+                   for (var j = i-1; j >= 0; j--){
+                     var prev = arguments[j];
+                     var countEmptyII = (prev.match(/empty/g)  || []).length;
+                     if(countEmptyII == 0){
+                         if (count == 0){
+                           path[i+1] = info[j][1] + ",1";
+                           info[i+1] = new Array(next, path[i+1], 2, window.innerWidth, window.innerWidth, window.innerHeight);
+                           arguments[j] = arguments[j] + ",empty";
+                           console.log(arguments[j]);
+                           count = tmp;
+                           break;
+                         }else{
+                           count--;
+                         }
+                     }
+                   }
+                 }
+               }
+              ```
+           If the next argument is also empty, we add1 to the counter and continue.
+        3. Two "empty": <br>
+           This just means that this node is a leaf node. Thus the path for the very next argument, we need to do the same as the previous case and find the right parent by manipulating the counter. The reason we set a "tmp" to the counter is that we don't want to lose our "count" everytime we have to go back.
+     - After this process, we would have our path, which has the exact same denotation as what we had for Binary Trees.
+  - Then getting the x,y coordinate and drawing the actual tree becomes a piece of cake; we are just reusing the same code as what we had before! <br>
+  
+3. dafd 
+  
+            
    
       
