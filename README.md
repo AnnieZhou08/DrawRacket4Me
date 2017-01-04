@@ -67,6 +67,24 @@ The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.j
   - Get Coordinates:
       - **Feeding/Preparing the array:** This step makes our x-y coordinates calculation much easier. After preparation, for an arbitrary node, denoted `info[i]` looks like: `info[i][0]` contains the node's actual data, `info[i][1]` is node's path as string, `info[i][2]` stores the # of siblings for this node, `info[i][3]` is the width of the window this node should occupy which is yet to be calculated, `info[i][4]` is node's x-coordinate yet to be calculated and `info[i][5]` is the y-coordinate yet to be calculated. Now, for our root node `info[0]`, we know it occupies the entire window's width; its x-coordinate should be right in the middle (`window.innerWidth/2`) and we can set the y-coordinate to be an arbitrary value that looks good.
       - **Calculating the coordinates:** There are three cases:
-         1. 
+         1. Current node has a `path.length` of previous node's `path.length + 1`. This implies this node is previous node's child. Recall that for the previous node, we would have the following information: its data; its path; its number of siblings the width of window it occupies; its x-coordinate and its y-coordinate, and for the current node, we know: its data; its path and its number of siblings. Thus to get the current node's x-coordinate, we simply get previous node's occupy width and divide it by current node's number of siblings. This is the new occupy width of our current node, and its x coordinate would simply be the at the middle of our first "chunk", which is expressed as new_x:
+         ```javascript 
+            var siblings = info[i][2];
+            var index = parseInt(info[i][1].charAt(info[i][1].length-1));
+            var layer = (info[i][1].length + 1)/2 - 1;
+            var width = info[i-1][3];
+            var x_coordinate = info[i-1][4];
+            var occupy_width = width/siblings;
+
+            var new_x = x_coordinate + (index - siblings/2 + 0.5)*occupy_width;
+         ```
+         2. Current node has the same `path.length` as the previous node. This implies that this node is previous node's sibling. To get its x-coordinate, we add a "width" to the previous node's x-coordinate.
+         3. Neither! We must find one if the node's siblings (if we do a nested loop from index 0, we will always find the current node's oldest sibling). Just like the previous case, instead of adding 1x width, we add Nx width, where N is basically "how young" this node is relative to the oldest sibling (which has an N of 0).
+      - All of this is then stored in the `info[]` array, which is then passed to `drawTree (info)`.
+   - Draw diagram:
+      - Drawing the lines: we must do this before drawing our circles (nodes) because the lines will overlap the circles and look ugly. Lines are always draw from the parent to its children. Thus for each node, we simply find its parent and draws it from the x,y coordinate of the parent to itself. To make the algorithm faster, we can test whether the parent is right before the current node, which decreases the amount of double looping needed.
+      - Drawing the nodes: basically using canvas to draw a circle, `filleStyle = "white"`.
+      - Putting down the data: gets the "letters" from our `info[]` and fills it onto the nodes.
+   - AND THAT'S ALL FOR N-CHILDREN TREES!
    
       
