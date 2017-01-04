@@ -46,6 +46,9 @@ Just `git clone` this repo and double click `start.html`, which will run the fil
 3. <strong> What if it doesn't draw for me? Or the diagram looks messed up? </strong> The likelihood is that there's some syntax error in your code, probably due to one of your bracket or a missing node. However I'm still an amateur programmer and this is one of my first projects. So feel free to contact me or even contribute to this repo if there is something wrong :). I would love to fix the problem!
 
 <h1> Here comes some technical stuff... How is it built? </h1>
+<h3>Run Time: O(n^2) </h3>
+"n" denotes the number of nodes.
+
 <h3> General Structure </h3>
 The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.js`, `binary.js` and `graph.js`.
 * `start.html`: basically the home page of the system. It's separated into two parts: html and an in-file `<script>`. The javascript included in this file does not contribute to the logic, only the UI. Shortly put, it basically makes DrawRacket4Me look pretty.
@@ -187,7 +190,9 @@ The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.j
       ```
    - **AND THAT'S IT FOR GRAPHS!**
    
-   
+----
+**NOTE**: This had been a fun project for me over the winter break after my 1A term as a CS student at Waterloo. I'm an amateur in CS and in fact, I have never really programmed (apart from some basic html/css stuff) before coming to university. A lot of this is pretty much me messing around with javascript and coming up with a super ratchet but entertaining solution. There're definitely way faster and way better solutions out there and if you found any bugs/errors or if you have a completely better way of dealing with this, please feel free to contact/make pull requests! :D
+
   
             
    
