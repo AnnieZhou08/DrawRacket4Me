@@ -16,7 +16,7 @@ Simply copy and paste your code from DrRacket into DrawRacket4Me, it will automa
 </table>
 
 <h3> How to Run it? </h3>
-**EZ.**
+<img src = "images/easy.png" width = "60px">
 <h4> Step 1:</h4>
 Just `git clone` this repo and double click `start.html`, which will run the file on your favorite browser.
 <table>
