@@ -56,6 +56,15 @@ The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.j
 1. **N-Children Trees** `logic.js`
    - Parsing:
       - Parsing process is separated into 5 stages:
+      ```javascript
+      var ProgressStage = {
+        OPENBRACKET: 1, 
+        CONSTRUCTOR: 2,
+        IDENTIFIER: 3, 
+        ARGUMENTS: 4, 
+        CLOSEBRACKET: 5 
+      }
+      ```
       - Function `process(block, identity)` loops through every character of block, which is the code user has entered and determines which stage we should head to. For example, when we hit an open bracket, we need to immediately go to CONSTRUCTOR, because either "list" or "make" should follow. "Identity" is the identifier name, and is used to verify the syntax of user's Racket code.
       - While parsing, the function also collects useful information, which includes: data of each node, which layer the node is at and the node's path. Root has a path of "0"; the first child of root has a path of "00"; the third child of the second child of root has a path of "021". The benefit of this denotation is that we can easily deduce the path of a node's closest sibling and parent. For example, if a node's path is "03251", we know its parent has to be "0325"; its older sibling has to be "03250" and its younger sibling has to be "03256". This information is essential in locating where the node is. <br>
          - **How do we find layer and path?** <br>
@@ -105,7 +114,9 @@ The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.j
                //the next node is the right child unless it's completely empty
 
                if(node == "empty"){
-                 //meaning the right side of arguments[i-1] is empty (filled); thus the very next argument has to find the first element                    with 0 empty while count == 0;
+                 //meaning the right side of arguments[i-1] is empty (filled); 
+                 //thus the very next argument has to find the first element
+                 //with 0 empty while count == 0;
                  if(next == "empty"){
                    count++;
                    continue;
@@ -117,7 +128,8 @@ The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.j
                      if(countEmptyII == 0){
                          if (count == 0){
                            path[i+1] = info[j][1] + ",1";
-                           info[i+1] = new Array(next, path[i+1], 2, window.innerWidth, window.innerWidth, window.innerHeight);
+                           info[i+1] = new Array(next, path[i+1], 2, 
+                           window.innerWidth, window.innerWidth, window.innerHeight);
                            arguments[j] = arguments[j] + ",empty";
                            console.log(arguments[j]);
                            count = tmp;
@@ -136,7 +148,46 @@ The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.j
      - After this process, we would have our path, which has the exact same denotation as what we had for Binary Trees.
   - Then getting the x,y coordinate and drawing the actual tree becomes a piece of cake; we are just reusing the same code as what we had before! <br>
   
-3. dafd 
+3. **Graphs** `graph.js`
+   - Parsing
+      - The parsing process for graphs are A LOT easier than trees, because the only constructor it has is "(list)", and the brackets for every single graph have the same formatting. Here's a clearer explanation:
+      ```javascript
+      /*
+         There are two types of constructing a graph:
+         '((A (B C D))
+           (B (E F G))
+           (C (D B E))) ... or
+
+         (list (list A (list B C D))
+               (list B (list E F G))
+               (list C (list D B E)))
+
+         Note that graph always opens with 1 extra bracket. The brackets
+         in the middle come in 2 pairs, and each node has 2 pairs.
+      */
+      ```
+      - The only 2 stages we ever needed were OPENBRACKET and ARGUMENTS, because CLOSEBRACKETS come in pair with OPENBRACKET, and we can only open the brackets in one particular way for graphs. We don't need identifiers or constructors because there is none, and the only constructor is "list".
+      - This way we can easily store all of our arguments in a `arguments[]`. In the example above, our `arguments[]` would look like: `arguments[0] = [A, B, C, D]`, `arguments[1] = [B, E, F, G]` etc. Moreover, we know that the first element of each arguments is the origin node, whereas the rest is the destination node from this one particular origin node.
+   - Getting the Coordinates
+      - Getting the coordinates for each node is also super easy for graphs because it honestly doesn't matter where we place the circles. As long as all the path are correct, it would be fine. However, to make our lives simpler, we choose to place the nodes in a circle (so 3 nodes form a triangle, 5 nodes form a pentagon etc.), which is very easy to calculate with basic trig.
+   - Drawing the Graph
+      - Drawing the lines, the nodes and filling in the data are very simple. However the difficult thing is drawing arrows. The simplest we can make thie problem be is to have the arrowhead as a triangle and rotate it, then drawing the arrowhead ON the circumference of our circles. There contain 2 problems: at which angle, and at what coordinates should we draw the arrowhead? To get the angle, we need our destination x-y coordinates and our origin x-y coordinates, then use arctan to find the angle in radians, called theta. However a more important angle would be phi, which is `Math.abs(theta)`. By using basic trig and knowing which quadrant we are in (which can be deduced from whether the destination x-y coordinates are greater or less than the origin x-y coordinates), we can find the desired information. The rest is all math but here's a snippet of the code:
+      ```javascript
+      \\example on how to get the coordinates at which we draw the arrows
+      else if (desty > starty && destx < startx){
+        destx = destx + CIRCLE_RADIUS*Math.cos(phi);
+        desty = desty - CIRCLE_RADIUS*Math.sin(phi);
+      }
+      \\example on at which angle we should rotate the arrow by
+      else if (desty > starty && destx < startx){
+        destx = destx + CIRCLE_RADIUS*Math.cos(phi);
+        desty = desty - CIRCLE_RADIUS*Math.sin(phi);
+        phi = Math.PI + (Math.PI/2 - phi);
+      }
+      ```
+   - **AND THAT'S IT FOR GRAPHS!**
+   
+   
   
             
    
