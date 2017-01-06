@@ -69,6 +69,7 @@
             $("#identifier").fadeTo(800,1);
           });
           $("#continue").click(function (){
+            $("#continue").fadeTo(10,1);
             $("#identity").fadeTo(100,0);
             $("#identifier").fadeTo(100,0, function(){
               $("#code").css("position","relative").animate({top:'-490px'},"fast", function(){
@@ -95,15 +96,6 @@
         }
       });
     });
-    
-    
-    if(list.checked){
-      process()
-    }else if(binary.checked){
-      
-    }else if(graph.checked){
-      
-    }
   }
   
   function startAnimation() {
