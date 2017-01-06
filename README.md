@@ -46,6 +46,9 @@ Just `git clone` this repo and double click `start.html`, which will run the fil
 3. <strong> What if it doesn't draw for me? Or the diagram looks messed up? </strong> The likelihood is that there's some syntax error in your code, probably due to one of your bracket or a missing node. However I'm still an amateur programmer and this is one of my first projects. So feel free to contact me or even contribute to this repo if there is something wrong :). I would love to fix the problem!
 
 <h1> Here comes some technical stuff... How is it built? </h1>
+<h3>Run Time: O(n^2) </h3>
+"n" denotes the number of nodes.
+
 <h3> General Structure </h3>
 The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.js`, `binary.js` and `graph.js`.
 * `start.html`: basically the home page of the system. It's separated into two parts: html and an in-file `<script>`. The javascript included in this file does not contribute to the logic, only the UI. Shortly put, it basically makes DrawRacket4Me look pretty.
@@ -56,6 +59,15 @@ The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.j
 1. **N-Children Trees** `logic.js`
    - Parsing:
       - Parsing process is separated into 5 stages:
+      ```javascript
+      var ProgressStage = {
+        OPENBRACKET: 1, 
+        CONSTRUCTOR: 2,
+        IDENTIFIER: 3, 
+        ARGUMENTS: 4, 
+        CLOSEBRACKET: 5 
+      }
+      ```
       - Function `process(block, identity)` loops through every character of block, which is the code user has entered and determines which stage we should head to. For example, when we hit an open bracket, we need to immediately go to CONSTRUCTOR, because either "list" or "make" should follow. "Identity" is the identifier name, and is used to verify the syntax of user's Racket code.
       - While parsing, the function also collects useful information, which includes: data of each node, which layer the node is at and the node's path. Root has a path of "0"; the first child of root has a path of "00"; the third child of the second child of root has a path of "021". The benefit of this denotation is that we can easily deduce the path of a node's closest sibling and parent. For example, if a node's path is "03251", we know its parent has to be "0325"; its older sibling has to be "03250" and its younger sibling has to be "03256". This information is essential in locating where the node is. <br>
          - **How do we find layer and path?** <br>
@@ -87,5 +99,99 @@ The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.j
       - Putting down the data: gets the "letters" from our `info[]` and fills it onto the nodes. <br>
    - **AND THAT'S ALL FOR N-CHILDREN TREES!**
 
-   
+=======
       
+   - **AND THAT'S ALL FOR N-CHILDREN TREES!**
+<br>
+2. **Binary Trees** `binary.js`
+   - Parsing:
+      - Follows similar steps to how we would parse an N-Children Tree. However what's different this time is that instead of storing the path in the arguments while parsing, we process the path after all the arguments have been collected. The reason for doing so is that the concept of a binary tree and an N-Children tree is slightly different (read more on it in "notes" section). A typical racket code for a binary tree with a root and right child looks like `(make-node a empty (make-node b empty empty))`. It could also look like `(make-node a 1 empty (make-node b 2 empty empty))`. Thus unlike N-Children trees, "empty" could be seen as a constructor, but without an opening bracket. Therefore there's no way of us knowing whether the character we are processing at the moment belongs to the data (e.g. "a", or the key-value pair "a, 1") or signifies that it's an empty node (unless we set an accumulator but that's messy). So here's my strategy:
+      - We parse through the racket code and collect every single argument just like we would do in N-Children trees, where whenever we hit a space, we place a "," and adds the character to the current argument, until we hit an opening bracket; then we add the rest of the arguments to a new array. For example if we have `(make-node a 1 empty (make-node b 2 empty empty))`, our `arguments[]` would look like `arguments[0] = "a,1,empty"`, `arguments[1] = "b,2,empty,empty"`. 
+      - Here's an important case to consider: `(make-node a (make-node b (make-node c empty empty) empty) empty)`; our `arguments[]` would look like: `arguments[0] = "a"`, `arguments[1] = "b"`, `arguments[2] = "c,empty,empty"`, `arguments[3] = "empty"` and `arguments[4] = "empty"`. We will come back to this one later.
+   - Processing the arguments:
+      - This is the stage where we get the path of each node. Since we are reusing our drawing strategy from N-Children trees, our denotation for the paths has to be the same. The difference here is "empty" would be treated as a child. So even if a node has no siblings, if it were to be placed on the right side, it would have an index of "1". 
+      - The thing to remember here is when we are looping through each argument, we are actually finding the path for the next node. For example if the current argument we are processing has no "empty" string, we know that the very next node has to be its child, placed at the left. Then clearly there emerge 3 cases:
+         1. No "empty": <br>
+            As forementioned, the very next node is the left child so we append "0" to the path.
+         2. One "empty": <br>
+            This means the very next node would be likely be the right child. However going back to our important case, we see that there exist 2 edge cases. One of them been that the entire argument itself == "empty" and the second one is that the very next argument also == "empty". So in our first edge case (where the very next argument is a filled node), we need to set a counter++, because the very next argument would need to find the closest node, while deducting the counter by 1, that has no "empty" and the counter == 0, which would be its parent. We then append "1" to it because it has to be a right child. Here's the code:
+            ```javascript
+             else if (countEmpty == 1){
+               //the next node is the right child unless it's completely empty
+
+               if(node == "empty"){
+                 //meaning the right side of arguments[i-1] is empty (filled); 
+                 //thus the very next argument has to find the first element
+                 //with 0 empty while count == 0;
+                 if(next == "empty"){
+                   count++;
+                   continue;
+                 }else{
+                   var tmp = count;
+                   for (var j = i-1; j >= 0; j--){
+                     var prev = arguments[j];
+                     var countEmptyII = (prev.match(/empty/g)  || []).length;
+                     if(countEmptyII == 0){
+                         if (count == 0){
+                           path[i+1] = info[j][1] + ",1";
+                           info[i+1] = new Array(next, path[i+1], 2, 
+                           window.innerWidth, window.innerWidth, window.innerHeight);
+                           arguments[j] = arguments[j] + ",empty";
+                           console.log(arguments[j]);
+                           count = tmp;
+                           break;
+                         }else{
+                           count--;
+                         }
+                     }
+                   }
+                 }
+               }
+              ```
+           If the next argument is also empty, we add1 to the counter and continue.
+        3. Two "empty": <br>
+           This just means that this node is a leaf node. Thus the path for the very next argument, we need to do the same as the previous case and find the right parent by manipulating the counter. The reason we set a "tmp" to the counter is that we don't want to lose our "count" everytime we have to go back.
+     - After this process, we would have our path, which has the exact same denotation as what we had for Binary Trees.
+  - Then getting the x,y coordinate and drawing the actual tree becomes a piece of cake; we are just reusing the same code as what we had before! <br>
+  
+3. **Graphs** `graph.js`
+   - Parsing
+      - The parsing process for graphs are A LOT easier than trees, because the only constructor it has is "(list)", and the brackets for every single graph have the same formatting. Here's a clearer explanation:
+      ```javascript
+      /*
+         There are two types of constructing a graph:
+         '((A (B C D))
+           (B (E F G))
+           (C (D B E))) ... or
+
+         (list (list A (list B C D))
+               (list B (list E F G))
+               (list C (list D B E)))
+
+         Note that graph always opens with 1 extra bracket. The brackets
+         in the middle come in 2 pairs, and each node has 2 pairs.
+      */
+      ```
+      - The only 2 stages we ever needed were OPENBRACKET and ARGUMENTS, because CLOSEBRACKETS come in pair with OPENBRACKET, and we can only open the brackets in one particular way for graphs. We don't need identifiers or constructors because there is none, and the only constructor is "list".
+      - This way we can easily store all of our arguments in a `arguments[]`. In the example above, our `arguments[]` would look like: `arguments[0] = [A, B, C, D]`, `arguments[1] = [B, E, F, G]` etc. Moreover, we know that the first element of each arguments is the origin node, whereas the rest is the destination node from this one particular origin node.
+   - Getting the Coordinates
+      - Getting the coordinates for each node is also super easy for graphs because it honestly doesn't matter where we place the circles. As long as all the path are correct, it would be fine. However, to make our lives simpler, we choose to place the nodes in a circle (so 3 nodes form a triangle, 5 nodes form a pentagon etc.), which is very easy to calculate with basic trig.
+   - Drawing the Graph
+      - Drawing the lines, the nodes and filling in the data are very simple. However the difficult thing is drawing arrows. The simplest we can make thie problem be is to have the arrowhead as a triangle and rotate it, then drawing the arrowhead ON the circumference of our circles. There contain 2 problems: at which angle, and at what coordinates should we draw the arrowhead? To get the angle, we need our destination x-y coordinates and our origin x-y coordinates, then use arctan to find the angle in radians, called theta. However a more important angle would be phi, which is `Math.abs(theta)`. By using basic trig and knowing which quadrant we are in (which can be deduced from whether the destination x-y coordinates are greater or less than the origin x-y coordinates), we can find the desired information. The rest is all math but here's a snippet of the code:
+      ```javascript
+      \\example on how to get the coordinates at which we draw the arrows
+      else if (desty > starty && destx < startx){
+        destx = destx + CIRCLE_RADIUS*Math.cos(phi);
+        desty = desty - CIRCLE_RADIUS*Math.sin(phi);
+      }
+      \\example on at which angle we should rotate the arrow by
+      else if (desty > starty && destx < startx){
+        destx = destx + CIRCLE_RADIUS*Math.cos(phi);
+        desty = desty - CIRCLE_RADIUS*Math.sin(phi);
+        phi = Math.PI + (Math.PI/2 - phi);
+      }
+      ```
+   - **AND THAT'S IT FOR GRAPHS!**
+   
+----
+**NOTE**: This had been a fun project for me over the winter break after my 1A term as a CS student at Waterloo. I'm an amateur in CS and in fact, I have never really programmed (apart from some basic html/css stuff) before coming to university. A lot of this is pretty much me messing around with javascript and coming up with a super ratchet but entertaining solution. There're definitely way faster and way better solutions out there and if you found any bugs/errors or if you have a completely better way of dealing with this, please feel free to contact/make pull requests! :D
