@@ -21,13 +21,13 @@
         <td><input type="radio" name="answer" id = "graph" value = "graph" style="width:30px; height:30px;"></td>
         <td style="text-align: left">Graphs</td>
       </tr>    
-    </table> <br><br>
+    </table> <br><br><br><br>
     <a href="#"> <img id = "continue" src="images/continue.png" width = 150px style="opacity:0;"></a> <br>
     <p id= "identity" style="font-size: 30px; opacity:0;" position = "relative">Identifier Name:</p>
     <p id = "identitiy">
     <input id = "identifier" type = "text" name = "firstname" placeholder="e.g. node, tree" style="font-size:30px; opacity:0;">
     </p>
-    <textarea id = "code" rows = "23" cols = "63" placeholder="enter your tree/graph here..." style="opacity: 0"></textarea>
+    <textarea id = "code" rows = "18" cols = "63" placeholder="enter your tree/graph here..." style="opacity: 0"></textarea>
   </body>
 
 
@@ -70,6 +70,7 @@
           });
           $("#continue").click(function (){
             $("#continue").fadeTo(10,1);
+            console.log("asdf");
             $("#identity").fadeTo(100,0);
             $("#identifier").fadeTo(100,0, function(){
               $("#code").css("position","relative").animate({top:'-490px'},"fast", function(){
