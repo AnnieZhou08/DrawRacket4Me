@@ -28,7 +28,7 @@ function process(block, identity){
         if (c == " "){
           continue;
         } else if (c != "("){
-          throw "Error: Bad Syntax";
+          throw "Error: Bad Syntax"; //if it's not an open bracket
         } else {
           numOpenBrackets++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;
@@ -52,7 +52,7 @@ function process(block, identity){
             }
             addedLayer = false;
           thisProcessStage = ProgressStage.IDENTIFIER;
-        } else if (constructor.length > 1000){
+        } else if (constructor.length > 8){ //both "make" and "list" have a length less than 8 - breaks the loop once syntax error is found
           throw "Error: not a constructor";
         } else {
             constructor += c;
@@ -61,7 +61,7 @@ function process(block, identity){
       
       case ProgressStage.IDENTIFIER:
         if (c == " "){
-          if (identifier == identity){
+          if (identifier.indexOf(identity) != -1){
             thisProcessStage = ProgressStage.ARGUMENTS;
           } else {
             throw "Error: Identifier undefined";
@@ -74,6 +74,9 @@ function process(block, identity){
         break;
         
       case ProgressStage.ARGUMENTS:
+        var countList = (block.match(/list/g)  || []).length; 
+        //check if list is replaced by " ' " symbol => if countList = 0, then it has been replaced by " ' ".
+        
         if (arguments.length == currentArgument){
            arguments[currentArgument]="";
         }
@@ -96,7 +99,7 @@ function process(block, identity){
           arguments[currentArgument] +="|"+path+"*"+layer;
           currentArgument++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;
-        } else if (c == "'"){
+        } else if (c == "'" && countList == 0){
           numOpenBrackets++;
           identifier = "";
           constructor = "'";
@@ -131,6 +134,25 @@ function process(block, identity){
         break;
     }
   }
+  console.log(arguments);
+  //removes the first "comma" left over from previous parsing
+  for (var i = 0; i < arguments.length; i++){
+    var arg = arguments[i];
+    var new_argument = "";
+    var shouldDelete = true;
+    for (var j = 0; j < arg.length; j++){
+      if (arg.charAt(j) == ',' && shouldDelete == true){
+        continue;
+      }else{
+        new_argument += arg.charAt(j);
+        if (isAlphaNumeric(arg.charAt(j))){
+          shouldDelete = false;
+        }
+      }
+    }
+    arguments[i] = new_argument;
+  }
+  
   console.log(arguments);
   processArguments(arguments);    
 }
@@ -298,4 +320,15 @@ function drawTree(info){
       ctx.fillStyle = "black";
       ctx.textAlign = "center";
       ctx. fillText(info[0][0], info[0][4], info[0][5]);
+}
+
+//helper function
+function isAlphaNumeric (letter){
+    var a = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    
+    if (a.indexOf(letter) == -1){
+      return false;
+    }else{
+      return true;
+    }
 }

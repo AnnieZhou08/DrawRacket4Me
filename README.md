@@ -85,6 +85,7 @@ The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.j
       - Drawing the lines: we must do this before drawing our circles (nodes) because the lines will overlap the circles and look ugly. Lines are always draw from the parent to its children. Thus for each node, we simply find its parent and draws it from the x,y coordinate of the parent to itself. To make the algorithm faster, we can test whether the parent is right before the current node, which decreases the amount of double looping needed. <br>
       - Drawing the nodes: basically using canvas to draw a circle, `filleStyle = "white"`. <br>
       - Putting down the data: gets the "letters" from our `info[]` and fills it onto the nodes. <br>
-   - AND THAT'S ALL FOR N-CHILDREN TREES!
+   - **AND THAT'S ALL FOR N-CHILDREN TREES!**
+
    
       

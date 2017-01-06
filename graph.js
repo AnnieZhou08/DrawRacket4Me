@@ -103,6 +103,10 @@ function processGraphArguments(arguments){
     if (index > -1){
       arguments[i].splice(index, 1);
     }
+    var index_1 = arguments[i].indexOf("list");
+    if (index_1 > -1){
+      arguments[i].splice(index_1, 1);
+    }
   }
   console.log(positions);
   console.log(arguments);

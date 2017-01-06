@@ -120,6 +120,25 @@ function processFinite(block, identity){
   console.log(identifier);
   console.log(arguments);
   
+  //removes the first "comma" left over from previous parsing
+  for (var i = 0; i < arguments.length; i++){
+    var arg = arguments[i];
+    var new_argument = "";
+    var shouldDelete = true;
+    for (var j = 0; j < arg.length; j++){
+      if (arg.charAt(j) == ',' && shouldDelete == true){
+        continue;
+      }else{
+        new_argument += arg.charAt(j);
+        if (isAlphaNumeric(arg.charAt(j))){
+          shouldDelete = false;
+        }
+      }
+    }
+    arguments[i] = new_argument;
+  }
+  
+  console.log(arguments);
   processFiniteArguments(arguments);
 }
 
@@ -351,5 +370,16 @@ function drawTreeFinite(info){
       ctx.fillStyle = "black";
       ctx.textAlign = "center";
       ctx. fillText(info[0][0], info[0][4], info[0][5]);
+}
+
+//helper function
+function isAlphaNumeric (letter){
+    var a = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    
+    if (a.indexOf(letter) == -1){
+      return false;
+    }else{
+      return true;
+    }
 }
 
