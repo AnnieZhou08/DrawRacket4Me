@@ -89,21 +89,21 @@ function process(block, identity){
             break;
           } else{
             alreadyClosed = false;
-            arguments[currentArgument] += "|" + path + "*" + layer;
+            arguments[currentArgument] += "|" + path;
             thisProcessStage = ProgressStage.CLOSEBRACKET;
           }
         } else if (c == "("){
           numOpenBrackets++;
           identifier = "";
           constructor = "";
-          arguments[currentArgument] +="|"+path+"*"+layer;
+          arguments[currentArgument] +="|"+path;
           currentArgument++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;
         } else if (c == "'" && countList == 0){
           numOpenBrackets++;
           identifier = "";
           constructor = "'";
-          arguments[currentArgument] +="|"+path+"*"+layer;
+          arguments[currentArgument] +="|"+path;
           currentArgument++;
           thisProcessStage = ProgressStage.CONSTRUCTOR;
         } else{
@@ -117,7 +117,7 @@ function process(block, identity){
         break; 
       case ProgressStage.CLOSEBRACKET:
         if (c == ")" && alreadyClosed ==false){
-          arguments[currentArgument] += "|" + path + "*" + layer;
+          arguments[currentArgument] += "|" + path;
           layer--;
           path.pop();
           alreadyClosed = true;
@@ -161,13 +161,19 @@ function processArguments(arguments){
   var info = [];
   for (var i = 0; i < arguments.length; i++){
     var arg = arguments[i];
-    var sliceIndex = arg.indexOf("*");
     var fieldIndex = arg.indexOf("|");
     
     var fields = arg.substr(0,fieldIndex);
-    var path = arg.substring(fieldIndex+1,sliceIndex);
+    var path = arg.substring(fieldIndex+1);
+    
+    if (path.indexOf("|") == -1){
+      path = arg.substring(fieldIndex+1);
+    }else{
+      path = path.substring(0, path.indexOf("|"));
+    }
     info[i] = new Array (fields, path);
   }
+  console.log(info);
   getSibling (info);
 }
   
