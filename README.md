@@ -98,10 +98,6 @@ The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.j
       - Drawing the nodes: basically using canvas to draw a circle, `filleStyle = "white"`. <br>
       - Putting down the data: gets the "letters" from our `info[]` and fills it onto the nodes. <br>
    - **AND THAT'S ALL FOR N-CHILDREN TREES!**
-
-=======
-      
-   - **AND THAT'S ALL FOR N-CHILDREN TREES!**
 <br>
 2. **Binary Trees** `binary.js`
    - Parsing:
