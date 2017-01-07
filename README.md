@@ -190,4 +190,4 @@ The entire system comprises of only 5 files: `start.html`, `draw.html`, `logic.j
    - **AND THAT'S IT FOR GRAPHS!**
    
 ----
-**NOTE**: This had been a fun project for me over the winter break after my 1A term as a CS student at Waterloo. I'm an amateur in CS and in fact, I have never really programmed (apart from some basic html/css stuff) before coming to university. A lot of this is pretty much me messing around with javascript and coming up with a super ratchet but entertaining solution. There're definitely way faster and way better solutions out there and if you found any bugs/errors or if you have a completely better way of dealing with this, please feel free to contact/make pull requests! :D
+**NOTE**: This had been a fun project for me over the winter break after my 1A term as a CS student at Waterloo. I'm messing around with javascript and coming up with a super ratchet but entertaining solution. There're definitely way faster and way better solutions out there and if you found any bugs/errors or if you have a completely better way of dealing with this, please feel free to contact/make pull requests! :D
